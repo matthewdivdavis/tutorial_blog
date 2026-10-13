@@ -2,23 +2,64 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Project demo</title>
+<title>Generative Adversarial Networks – Stat 386 Tutorial Blog</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -32,15 +73,14 @@ ul.task-list li input[type="checkbox"] {
 <meta name="quarto:offset" content="./">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,7 +121,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Project demo</span>
+    <span class="navbar-title">Stat 386 Tutorial Blog</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -109,15 +149,26 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-is-a-generative-adversarial-network-gan-and-what-is-it-used-for" id="toc-what-is-a-generative-adversarial-network-gan-and-what-is-it-used-for" class="nav-link active" data-scroll-target="#what-is-a-generative-adversarial-network-gan-and-what-is-it-used-for">What is a Generative Adversarial Network (GAN) and what is it used for?</a></li>
+  <li><a href="#generator" id="toc-generator" class="nav-link" data-scroll-target="#generator">The Generator</a></li>
+  <li><a href="#discriminator" id="toc-discriminator" class="nav-link" data-scroll-target="#discriminator">The Discriminator</a></li>
+  <li><a href="#two-real-world-examples" id="toc-two-real-world-examples" class="nav-link" data-scroll-target="#two-real-world-examples">Two Real World Examples</a></li>
+  <li><a href="#putting-it-together" id="toc-putting-it-together" class="nav-link" data-scroll-target="#putting-it-together">Putting it Together</a></li>
+  <li><a href="#try-it-yourself" id="toc-try-it-yourself" class="nav-link" data-scroll-target="#try-it-yourself">Try it yourself</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Project demo</h1>
+<h1 class="title">Generative Adversarial Networks</h1>
 </div>
 
 
@@ -134,10 +185,445 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This is a Quarto website.</p>
-<p>To learn more about Quarto websites visit <a href="https://quarto.org/docs/websites" class="uri">https://quarto.org/docs/websites</a>.</p>
+<section id="what-is-a-generative-adversarial-network-gan-and-what-is-it-used-for" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-a-generative-adversarial-network-gan-and-what-is-it-used-for">What is a Generative Adversarial Network (GAN) and what is it used for?</h3>
+<p>A GAN is a machine learning model used to generate unique images. It is called an “<em>adversarial</em>” network because there are two pieces fighting against each other to create the best outcome.</p>
+<p>The two models working inside a GAN are the <a href="#generator"><em>Generator</em></a> and the <a href="#discriminator"><em>Discriminator</em></a>. These two pieces challenge each other, trying to catch the other in an error, which makes each program better in the end.</p>
+<blockquote class="blockquote">
+<p>Throughout this blog you will see examples from code written with the help of an AI model (Claude by Anthropic). This is to help visualize and understand what is going on inside the GAN</p>
+</blockquote>
+</section>
+<section id="generator" class="level3">
+<h3 class="anchored" data-anchor-id="generator">The Generator</h3>
+<p>In a GAN, the <em>Generator’s</em> job is to produce unique images. The problem the Generator faces is knowing <em>what</em> to come up with when creating these unique images. The first time the Generator runs it, has no data to work with, so it just comes up with nonsense. See Fig1</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_00001.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig1:</strong> A GAN Generator’s first attempt at making an image</figcaption>
+</figure>
+</div>
+<p>This initial output (a bunch of visual noise) isn’t what we want. In order to get a more useful output we need to teach the Generator that this output is not what we want. This is where the Discriminator comes in.</p>
+</section>
+<section id="discriminator" class="level3">
+<h3 class="anchored" data-anchor-id="discriminator">The Discriminator</h3>
+<p>The Discriminator compares the generated images with real images from a training dataset. In this example our dataset consists of small pixelmaps of 5-point stars, see Fig2.</p>
+<div class="quarto-layout-panel" data-layout-ncol="5">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/star_0.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig2-a</strong></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/star_1.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig2-b</strong></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/star_2.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig2-c</strong></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/star_3.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig2-d</strong></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/star_4.png" class="img-fluid figure-img"></p>
+<figcaption><strong>Fig2-e</strong></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>The Discriminator looks at the real dataset, and the generated images and tries to determine whether a given image is fake (from the Generator) or real (from the dataset).</p>
+</section>
+<section id="two-real-world-examples" class="level3">
+<h3 class="anchored" data-anchor-id="two-real-world-examples">Two Real World Examples</h3>
+<section id="a-real-fake-example-of-a-generator-and-discriminator" class="level4">
+<h4 class="anchored" data-anchor-id="a-real-fake-example-of-a-generator-and-discriminator">A Real (Fake) Example of a Generator and Discriminator</h4>
+<blockquote class="blockquote">
+<p>A Counterfeiter is trying to make fake money, and the Police are trying to catch him. It’s a game of cops and robbers. The Counterfeiter makes their first $1 bill and uses it at a store. The Police find the bill and compare it to a <em>real</em> $1 bill to determine the one from the store is a fake. The Counterfeiter is caught!</p>
+<p>The Counterfeiter looks at the failed fake and tries again, changing some of the pieces of the $1 bill to make it look more realistic. He brings this $1 bill back to the store and tries to use it. When the bill is intercepted by the Police they check it against what they know as real money. This time, the fake bill looks so real that the Police can’t tell the difference! The counterfeit bill never gets caught.</p>
+</blockquote>
+</section>
+<section id="a-real-real-example-of-an-adversarial-network" class="level4">
+<h4 class="anchored" data-anchor-id="a-real-real-example-of-an-adversarial-network">A Real (Real) Example of an Adversarial Network</h4>
+<blockquote class="blockquote">
+<p>This technique of an adversarial network is also a common approach for solving real security issues. In Cyber Security it is common to have a team, the Good Guys and a team, the Bad Guys. The Good Guys try to create security protocols that prevent malicious users from getting into a network, protecting user and company data/resources.</p>
+<p>But how do you know if the security measures are good? The Bad Guys go in and try to break down all the work the Good Guys did. This allows for companies to find problems in security in a safe and manageable way, instead of allowing <em>real</em> bad guys (hackers and other criminals) to find the weak spots first.</p>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Generator</th>
+<th>Discriminator</th>
+<th>Adversarial Network</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A Counterfeiter Creating Fake Money</td>
+<td>The Police Investigating the Money</td>
+<td>Ongoing Battle Between Counterfeiters and Police</td>
+</tr>
+<tr class="even">
+<td>Bad Guys</td>
+<td>Good Guys</td>
+<td>Cyber Security Defense Teams</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="putting-it-together" class="level3">
+<h3 class="anchored" data-anchor-id="putting-it-together">Putting it Together</h3>
+<p>In a GAN system the <a href="#discriminator">Discriminator</a> is fed both real <em>and</em> fake images. Each time the Discriminator is learning how to tell them apart. Whenever a Discriminator correctly predicts an image, it gets positive feedback; each time it’s wrong the Discriminator gets negative feedback. This process of getting feedback is called <strong><em>backpropagation</em></strong>.</p>
+<p>The <a href="#generator">Generator</a> is also receiving immediate feedback on whether it passed the Discriminator or not. If the Discriminator fails, the Generator wins. If the Discriminator succeeds the Generator loses. Each win and loss tells the Generator if it’s doing a good job creating the image.</p>
+<p>This system loops through thousands of times generating and discriminating images over and over again until the final Generator consistently beats the Discriminator.</p>
+<p>We call these loops <strong><em>epochs</em></strong> and we can see the progress throughout the epochs in the figures below.</p>
+<div class="quarto-layout-panel" data-layout-ncol="3">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_01000.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 1000</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_01500.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 1500</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_02000.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 2000</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_02500.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 2500</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_03000.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 3000</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_03500.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 3500</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_04000.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 4000</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_04500.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 4500</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/epoch_05000.png" class="img-fluid figure-img"></p>
+<figcaption>Epoch 5000</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>As the epochs progress the images get more and more clear, and actually start to look like the training dataset.</p>
+</section>
+<section id="try-it-yourself" class="level3">
+<h3 class="anchored" data-anchor-id="try-it-yourself">Try it yourself</h3>
+<p>Here is all the code used to build and train a Generator and Discriminator for a GAN. Enjoy!</p>
+<div id="41105e07" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Necessary Imports, Macros and Helper Functions</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>IMG_SIZE <span class="op">=</span> <span class="dv">16</span>          <span class="co"># images are IMG_SIZE x IMG_SIZE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>RADIUS <span class="op">=</span> <span class="fl">2.5</span>           <span class="co"># circle radius</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>NOISE_DIM <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>N_REAL_SAMPLES <span class="op">=</span> <span class="dv">2000</span>  <span class="co"># how many synthetic "real" images to generate</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>EPOCHS <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>SHAPE <span class="op">=</span> <span class="st">"star"</span>         <span class="co"># "star" or "circle"</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>DATA_SEED <span class="op">=</span> <span class="dv">0</span>                  <span class="co"># fixed, so the dataset is identical every render</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>TRAIN_SEED <span class="op">=</span> <span class="bu">int</span>(time.time())  <span class="co"># set to a fixed int for reproducible training</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(TRAIN_SEED)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># All paths are relative to the folder the .qmd / script lives in</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ROOT <span class="op">=</span> Path(<span class="st">"."</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>DATA_DIR <span class="op">=</span> ROOT <span class="op">/</span> <span class="st">"data"</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>SAMPLE_DIR <span class="op">=</span> ROOT <span class="op">/</span> <span class="st">"samples"</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>SNAPSHOT_DIR <span class="op">=</span> ROOT <span class="op">/</span> <span class="st">"snapshots"</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>G_PATH <span class="op">=</span> ROOT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>SHAPE<span class="sc">}</span><span class="ss">_generator.pt"</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_dataset(name, n, data_seed<span class="op">=</span>DATA_SEED):</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Load a cached dataset if it exists, otherwise generate and save it.</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">    Stored as bool (images are binary) to keep the file small.</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> DATA_DIR <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">_n</span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">_seed</span><span class="sc">{</span>data_seed<span class="sc">}</span><span class="ss">.pt"</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> torch.load(path)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mask.<span class="bu">float</span>() <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>  <span class="co"># back to [-1, 1]</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> to_uint8(imgs):</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""(-1,1) tensor -&gt; uint8 numpy array in [0, 255]."""</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ((imgs.detach().cpu().numpy() <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span> <span class="op">*</span> <span class="dv">255</span>).astype(<span class="st">"uint8"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_samples(n<span class="op">=</span><span class="dv">5</span>):</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Save a few real training images as individual PNGs."""</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, img <span class="kw">in</span> <span class="bu">enumerate</span>(to_uint8(REAL_DATA[:n])):</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        Image.fromarray(img).resize((<span class="dv">128</span>, <span class="dv">128</span>), Image.NEAREST).save(</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            SAMPLE_DIR <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>SHAPE<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">.png"</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_grid(imgs, path, nrow<span class="op">=</span><span class="dv">5</span>, pad<span class="op">=</span><span class="dv">2</span>, scale<span class="op">=</span><span class="dv">8</span>):</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Save a batch of (-1,1)-range images as one PNG grid."""</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    imgs <span class="op">=</span> to_uint8(imgs)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> imgs.shape[<span class="dv">0</span>]</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    nrows_grid <span class="op">=</span> <span class="op">-</span>(<span class="op">-</span>n <span class="op">//</span> nrow)  <span class="co"># ceil</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    cell <span class="op">=</span> IMG_SIZE <span class="op">+</span> pad</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    grid <span class="op">=</span> np.zeros((nrows_grid <span class="op">*</span> cell, nrow <span class="op">*</span> cell), dtype<span class="op">=</span><span class="st">"uint8"</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, im <span class="kw">in</span> <span class="bu">enumerate</span>(imgs):</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        r, c <span class="op">=</span> <span class="bu">divmod</span>(i, nrow)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        grid[r <span class="op">*</span> cell: r <span class="op">*</span> cell <span class="op">+</span> IMG_SIZE, c <span class="op">*</span> cell: c <span class="op">*</span> cell <span class="op">+</span> IMG_SIZE] <span class="op">=</span> im</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    Image.fromarray(grid).resize(</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>        (grid.shape[<span class="dv">1</span>] <span class="op">*</span> scale, grid.shape[<span class="dv">0</span>] <span class="op">*</span> scale), Image.NEAREST</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    ).save(path)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>REAL_DATA <span class="op">=</span> load_dataset(SHAPE, N_REAL_SAMPLES)  <span class="co"># (N, IMG_SIZE, IMG_SIZE)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="fbadfb8d" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Class Definitions (Generator and Discriminator)</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Generator(nn.Module):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            nn.Linear(NOISE_DIM, <span class="dv">128</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">128</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, IMG_SIZE <span class="op">*</span> IMG_SIZE),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            nn.Tanh(),  <span class="co"># output in [-1, 1], same range as the real data</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, z):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.net(z).view(<span class="op">-</span><span class="dv">1</span>, IMG_SIZE, IMG_SIZE)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Discriminator(nn.Module):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            nn.Linear(IMG_SIZE <span class="op">*</span> IMG_SIZE, <span class="dv">128</span>),</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">128</span>),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            nn.LeakyReLU(<span class="fl">0.2</span>),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">1</span>),  <span class="co"># raw logit</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.net(x.view(x.size(<span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<!-- ```{python}
+
+REAL_DATA = load_dataset(SHAPE, N_REAL_SAMPLES)  # (N, IMG_SIZE, IMG_SIZE)
+
+def train(epochs=EPOCHS, batch_size=64, lr=2e-4, print_every=500,
+          snapshot_dir=SNAPSHOT_DIR):
+    snapshot_dir = Path(snapshot_dir)
+    snapshot_dir.mkdir(exist_ok=True)
+
+    G, D = Generator(), Discriminator()
+    opt_g = torch.optim.Adam(G.parameters(), lr=lr, betas=(0.5, 0.999))
+    opt_d = torch.optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
+    loss_fn = nn.BCEWithLogitsLoss()
+    fixed_z = torch.randn(20, NOISE_DIM)  # same noise each snapshot, so you can watch it evolve
+
+    for epoch in range(1, epochs + 1):
+        idx = torch.randint(0, len(REAL_DATA), (batch_size,))
+        real = REAL_DATA[idx]
+
+        z = torch.randn(batch_size, NOISE_DIM)
+        fake = G(z)
+
+        # === Train Discriminator ===
+        opt_d.zero_grad()
+        real_pred = D(real)
+        fake_pred = D(fake.detach())
+        d_loss = loss_fn(real_pred, torch.full_like(real_pred, 0.9)) + \
+            loss_fn(fake_pred, torch.zeros_like(fake_pred))
+        d_loss.backward()
+        opt_d.step()
+
+        # === Train Generator ===
+        opt_g.zero_grad()
+        fake_pred = D(fake)
+        g_loss = loss_fn(fake_pred, torch.ones_like(fake_pred))
+        g_loss.backward()
+        opt_g.step()
+
+        if epoch % print_every == 0 or epoch == 1:
+            print(f"epoch {epoch:5d} | D loss {d_loss.item():.3f} | G loss {g_loss.item():.3f}")
+            with torch.no_grad():
+                samples = G(fixed_z)
+            save_grid(samples, snapshot_dir / f"epoch_{epoch:05d}.png")
+
+    return G
 
 
+# ---------------------------------------------------------------------------
+# 5. RUN (skips training if a saved generator already exists)
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    save_samples() # Save a 5 imageas from the dataset for us to see
+
+    if G_PATH.exists():
+        trained_G = Generator()
+        trained_G.load_state_dict(torch.load(G_PATH))
+        print(f"Loaded trained generator from {G_PATH}")
+    else:
+        trained_G = train()
+        torch.save(trained_G.state_dict(), G_PATH)
+        print(f"\nSaved generator to {G_PATH} and snapshots to {SNAPSHOT_DIR}/")
+
+    # Final samples from the trained generator
+    with torch.no_grad():
+        save_grid(trained_G(torch.randn(20, NOISE_DIM)), ROOT / f"{SHAPE}_final.png") -->
+<!-- ``` -->
+<div id="0e3ea405" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>save_samples() <span class="co"># Saves 5 images from the load_dataset</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>lr<span class="op">=</span><span class="fl">2e-4</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>print_every <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>snapshot_dir <span class="op">=</span> Path(SNAPSHOT_DIR)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating two Generator and Discriminator objects</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>G, D <span class="op">=</span> Generator(), Discriminator() </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>opt_g <span class="op">=</span> torch.optim.Adam(G.parameters(), lr<span class="op">=</span>lr, betas <span class="op">=</span> (<span class="fl">0.5</span>, <span class="fl">0.999</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>opt_d <span class="op">=</span> torch.optim.Adam(D.parameters(), lr<span class="op">=</span>lr, betas<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">0.999</span>))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>loss_fn <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>fixed_z <span class="op">=</span> torch.randn(<span class="dv">20</span>, NOISE_DIM) <span class="co"># same noise for each snapshot, so we can watch it evolve</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Looping throught the predetermined number of EPOCHS</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, EPOCHS <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Getting a random sample from the real image dataset</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> torch.randint(<span class="dv">0</span>, <span class="bu">len</span>(REAL_DATA), (batch_size,))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    real <span class="op">=</span> REAL_DATA[idx]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Generating an image with the generator</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> torch.randn(batch_size, NOISE_DIM)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    fake <span class="op">=</span> G(z)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># === Train Discriminator ===</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    opt_d.zero_grad()</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    real_pred <span class="op">=</span> D(real)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    fake_pred <span class="op">=</span> D(fake.detach())</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    d_loss <span class="op">=</span> loss_fn(real_pred, torch.full_like(real_pred, <span class="fl">0.9</span>)) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        loss_fn(fake_pred, torch.zeros_like(fake_pred))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    d_loss.backward()</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    opt_d.step()</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># === Train Generator ===</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    opt_g.zero_grad()</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    fake_pred <span class="op">=</span> D(fake)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    g_loss <span class="op">=</span> loss_fn(fake_pred, torch.ones_like(fake_pred))</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    g_loss.backward()</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    opt_g.step()</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> epoch <span class="op">%</span> print_every <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> epoch <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"epoch </span><span class="sc">{</span>epoch<span class="sc">:5d}</span><span class="ss"> | D loss </span><span class="sc">{</span>d_loss<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss"> | G loss </span><span class="sc">{</span>g_loss<span class="sc">.</span>item()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>            samples <span class="op">=</span> G(fixed_z)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        save_grid(samples, snapshot_dir <span class="op">/</span> <span class="ss">f"epoch_</span><span class="sc">{</span>epoch<span class="sc">:05d}</span><span class="ss">.png"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>torch.save(G.state_dict(), G_PATH)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Saved generator to </span><span class="sc">{</span>G_PATH<span class="sc">}</span><span class="ss"> and snapshots to </span><span class="sc">{</span>SNAPSHOT_DIR<span class="sc">}</span><span class="ss">/"</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    save_grid(G(torch.randn(<span class="dv">20</span>, NOISE_DIM)), ROOT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>SHAPE<span class="sc">}</span><span class="ss">_final.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>epoch     1 | D loss 1.441 | G loss 0.675
+epoch   500 | D loss 0.793 | G loss 2.146
+epoch  1000 | D loss 0.888 | G loss 2.511
+epoch  1500 | D loss 0.674 | G loss 2.501
+epoch  2000 | D loss 0.758 | G loss 3.094
+epoch  2500 | D loss 0.629 | G loss 2.542
+epoch  3000 | D loss 0.632 | G loss 2.926
+epoch  3500 | D loss 0.687 | G loss 2.555
+epoch  4000 | D loss 0.646 | G loss 2.941
+epoch  4500 | D loss 0.807 | G loss 2.289
+epoch  5000 | D loss 0.464 | G loss 3.657
+
+Saved generator to star_generator.pt and snapshots to snapshots/</code></pre>
+</div>
+</div>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
