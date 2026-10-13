@@ -1,0 +1,22 @@
+[project]
+name = "tutorial-blog"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Matthew", email = "davismatthewrocks@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "jupyter>=1.1.1",
+    "numpy>=2.5.4",
+    "pillow>=12.3.0",
+    "torch>=2.14.1",
+]
+
+[project.scripts]
+tutorial-blog = "tutorial_blog:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"
