@@ -265,7 +265,6 @@ for epoch in range(1, EPOCHS + 1):
         save_grid(samples, snapshot_dir / f"epoch_{epoch:05d}.png")
     
 torch.save(G.state_dict(), G_PATH)
-print(f"\nSaved generator to {G_PATH} and snapshots to {SNAPSHOT_DIR}/")
 
 with torch.no_grad():
     save_grid(G(torch.randn(20, NOISE_DIM)), ROOT / f"{SHAPE}_final.png")
