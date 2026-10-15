@@ -2,4 +2,4 @@
 title: "About"
 ---
 
-About this site
+This site hosts a tutorial blog post about GANs for my Stat3386 class. 
