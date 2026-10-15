@@ -66,6 +66,21 @@ In a GAN system the [Discriminator](#discriminator) is fed both real *and* fake 
 
 The [Generator](#generator) is also receiving immediate feedback on whether it passed the Discriminator or not. If the Discriminator fails, the Generator wins. If the Discriminator succeeds the Generator loses. Each win and loss tells the Generator if it's doing a good job creating the image. 
 
+**The Math**
+
+The mathematic definition of this competition can express as follows: 
+
+$$
+\min_G \max_D V(D,G)
+=
+\mathbb{E}_{x\sim p_{\text{data}}}[\log D(x)]
++
+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]
+$$
+This is a standard GAN equation where $G$ preresents the Generator and $D$ represents the Discriminator. The Generator takes random noise $z$ and producs and image $G(z)$, while the Discriminator estimates whether an image is real.
+
+The Discriminator tries to maximize this objective by correctly identifying real images, while the Generator tries to minimize it by producing images that fool the Discriminator.
+
 This system loops through thousands of times generating and discriminating images over and over again until the final Generator consistently beats the Discriminator. 
 
 We call these loops ***epochs*** and we can see the progress throughout the epochs in the figures below. 
