@@ -109,6 +109,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -300,6 +329,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="putting-it-together">Putting it Together</h3>
 <p>In a GAN system the <a href="#discriminator">Discriminator</a> is fed both real <em>and</em> fake images. Each time the Discriminator is learning how to tell them apart. Whenever a Discriminator correctly predicts an image, it gets positive feedback; each time it’s wrong the Discriminator gets negative feedback. This process of getting feedback is called <strong><em>backpropagation</em></strong>.</p>
 <p>The <a href="#generator">Generator</a> is also receiving immediate feedback on whether it passed the Discriminator or not. If the Discriminator fails, the Generator wins. If the Discriminator succeeds the Generator loses. Each win and loss tells the Generator if it’s doing a good job creating the image.</p>
+<p><strong>The Math</strong></p>
+<p>The mathematic definition of this competition can express as follows:</p>
+<p><span class="math display">\[
+\min_G \max_D V(D,G)
+=
+\mathbb{E}_{x\sim p_{\text{data}}}[\log D(x)]
++
+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]
+\]</span> This is a standard GAN equation where <span class="math inline">\(G\)</span> preresents the Generator and <span class="math inline">\(D\)</span> represents the Discriminator. The Generator takes random noise <span class="math inline">\(z\)</span> and producs and image <span class="math inline">\(G(z)\)</span>, while the Discriminator estimates whether an image is real.</p>
+<p>The Discriminator tries to maximize this objective by correctly identifying real images, while the Generator tries to minimize it by producing images that fool the Discriminator.</p>
 <p>This system loops through thousands of times generating and discriminating images over and over again until the final Generator consistently beats the Discriminator.</p>
 <p>We call these loops <strong><em>epochs</em></strong> and we can see the progress throughout the epochs in the figures below.</p>
 <div class="quarto-layout-panel" data-layout-ncol="3">
@@ -387,7 +426,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="try-it-yourself" class="level3">
 <h3 class="anchored" data-anchor-id="try-it-yourself">Try it yourself</h3>
 <p>Here is all the code used to build and train a Generator and Discriminator for a GAN. Enjoy!</p>
-<div id="41105e07" class="cell" data-execution_count="1">
+<div id="cda39898" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Necessary Imports, Macros and Helper Functions</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
@@ -454,7 +493,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>REAL_DATA <span class="op">=</span> load_dataset(SHAPE, N_REAL_SAMPLES)  <span class="co"># (N, IMG_SIZE, IMG_SIZE)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="fbadfb8d" class="cell" data-execution_count="2">
+<div id="f260dc49" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Class Definitions (Generator and Discriminator)</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Generator(nn.Module):</span>
@@ -488,73 +527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.net(x.view(x.size(<span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<!-- ```{python}
-
-REAL_DATA = load_dataset(SHAPE, N_REAL_SAMPLES)  # (N, IMG_SIZE, IMG_SIZE)
-
-def train(epochs=EPOCHS, batch_size=64, lr=2e-4, print_every=500,
-          snapshot_dir=SNAPSHOT_DIR):
-    snapshot_dir = Path(snapshot_dir)
-    snapshot_dir.mkdir(exist_ok=True)
-
-    G, D = Generator(), Discriminator()
-    opt_g = torch.optim.Adam(G.parameters(), lr=lr, betas=(0.5, 0.999))
-    opt_d = torch.optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
-    loss_fn = nn.BCEWithLogitsLoss()
-    fixed_z = torch.randn(20, NOISE_DIM)  # same noise each snapshot, so you can watch it evolve
-
-    for epoch in range(1, epochs + 1):
-        idx = torch.randint(0, len(REAL_DATA), (batch_size,))
-        real = REAL_DATA[idx]
-
-        z = torch.randn(batch_size, NOISE_DIM)
-        fake = G(z)
-
-        # === Train Discriminator ===
-        opt_d.zero_grad()
-        real_pred = D(real)
-        fake_pred = D(fake.detach())
-        d_loss = loss_fn(real_pred, torch.full_like(real_pred, 0.9)) + \
-            loss_fn(fake_pred, torch.zeros_like(fake_pred))
-        d_loss.backward()
-        opt_d.step()
-
-        # === Train Generator ===
-        opt_g.zero_grad()
-        fake_pred = D(fake)
-        g_loss = loss_fn(fake_pred, torch.ones_like(fake_pred))
-        g_loss.backward()
-        opt_g.step()
-
-        if epoch % print_every == 0 or epoch == 1:
-            print(f"epoch {epoch:5d} | D loss {d_loss.item():.3f} | G loss {g_loss.item():.3f}")
-            with torch.no_grad():
-                samples = G(fixed_z)
-            save_grid(samples, snapshot_dir / f"epoch_{epoch:05d}.png")
-
-    return G
-
-
-# ---------------------------------------------------------------------------
-# 5. RUN (skips training if a saved generator already exists)
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    save_samples() # Save a 5 imageas from the dataset for us to see
-
-    if G_PATH.exists():
-        trained_G = Generator()
-        trained_G.load_state_dict(torch.load(G_PATH))
-        print(f"Loaded trained generator from {G_PATH}")
-    else:
-        trained_G = train()
-        torch.save(trained_G.state_dict(), G_PATH)
-        print(f"\nSaved generator to {G_PATH} and snapshots to {SNAPSHOT_DIR}/")
-
-    # Final samples from the trained generator
-    with torch.no_grad():
-        save_grid(trained_G(torch.randn(20, NOISE_DIM)), ROOT / f"{SHAPE}_final.png") -->
-<!-- ``` -->
-<div id="0e3ea405" class="cell" data-execution_count="3">
+<div id="f100da12" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>save_samples() <span class="co"># Saves 5 images from the load_dataset</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">64</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>lr<span class="op">=</span><span class="fl">2e-4</span></span>
@@ -601,24 +574,21 @@ if __name__ == "__main__":
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        save_grid(samples, snapshot_dir <span class="op">/</span> <span class="ss">f"epoch_</span><span class="sc">{</span>epoch<span class="sc">:05d}</span><span class="ss">.png"</span>)</span>
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>torch.save(G.state_dict(), G_PATH)</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Saved generator to </span><span class="sc">{</span>G_PATH<span class="sc">}</span><span class="ss"> and snapshots to </span><span class="sc">{</span>SNAPSHOT_DIR<span class="sc">}</span><span class="ss">/"</span>)</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    save_grid(G(torch.randn(<span class="dv">20</span>, NOISE_DIM)), ROOT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>SHAPE<span class="sc">}</span><span class="ss">_final.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    save_grid(G(torch.randn(<span class="dv">20</span>, NOISE_DIM)), ROOT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>SHAPE<span class="sc">}</span><span class="ss">_final.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>epoch     1 | D loss 1.441 | G loss 0.675
-epoch   500 | D loss 0.793 | G loss 2.146
-epoch  1000 | D loss 0.888 | G loss 2.511
-epoch  1500 | D loss 0.674 | G loss 2.501
-epoch  2000 | D loss 0.758 | G loss 3.094
-epoch  2500 | D loss 0.629 | G loss 2.542
-epoch  3000 | D loss 0.632 | G loss 2.926
-epoch  3500 | D loss 0.687 | G loss 2.555
-epoch  4000 | D loss 0.646 | G loss 2.941
-epoch  4500 | D loss 0.807 | G loss 2.289
-epoch  5000 | D loss 0.464 | G loss 3.657
-
-Saved generator to star_generator.pt and snapshots to snapshots/</code></pre>
+<pre><code>epoch     1 | D loss 1.406 | G loss 0.724
+epoch   500 | D loss 0.922 | G loss 1.543
+epoch  1000 | D loss 0.933 | G loss 1.675
+epoch  1500 | D loss 0.788 | G loss 2.348
+epoch  2000 | D loss 0.633 | G loss 2.425
+epoch  2500 | D loss 0.802 | G loss 2.202
+epoch  3000 | D loss 0.847 | G loss 1.583
+epoch  3500 | D loss 0.986 | G loss 1.968
+epoch  4000 | D loss 0.549 | G loss 2.746
+epoch  4500 | D loss 0.715 | G loss 2.725
+epoch  5000 | D loss 0.660 | G loss 2.025</code></pre>
 </div>
 </div>
 
